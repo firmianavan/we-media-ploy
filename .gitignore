@@ -22,3 +22,7 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+#javascript
+resource/node_modules/*
+resource/react_module/*
