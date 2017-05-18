@@ -3,7 +3,7 @@ class SingleColBodyV extends React.Component{
     super(props);
     this.state = {
         value: '',
-        tags: ["go","babel"]
+        tags: ["go"]
     };
   }
   render(){

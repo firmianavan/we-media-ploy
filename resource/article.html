@@ -17,27 +17,42 @@
     <title>we media</title>
     <meta name="keywords" content="简书,简书官网,图文编辑软件,简书下载,图文创作,创作软件,原创社区,小说,散文,写作,阅读">
   <meta name="csrf-param" content="authenticity_token" />
-<meta name="csrf-token" content="cIFd6zesjZYQwxKdooFq0WPa+hsaCjjHPYP34o3BpevyOyAQW1ovHzD+jZvFo2r6466jfSx8EQHNPs/UNMFGBw==" />
+  <meta name="csrf-token" content="cIFd6zesjZYQwxKdooFq0WPa+hsaCjjHPYP34o3BpevyOyAQW1ovHzD+jZvFo2r6466jfSx8EQHNPs/UNMFGBw==" />
+  <base href="/">
 
 
-<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
-<link rel="stylesheet" type="text/css" href="css/wmp.css">
+<link rel="stylesheet" type="text/css" href="resource/css/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="resource/css/wmp.css">
 
-<script src="node_modules/react/dist/react.js"></script>
-<script src="node_modules/react-dom/dist/react-dom.min.js"></script>
-<script src="node_modules/react-bootstrap/dist/react-bootstrap.js"></script>
+<script src="resource/node_modules/react/dist/react.js"></script>
+<script src="resource/node_modules/prop-types/prop-types.min.js"></script>
+<script src="resource/node_modules/react-dom/dist/react-dom.js"></script>
+<script src="resource/node_modules/react-router/umd/react-router.js"></script>
+<script src="resource/node_modules/react-router-dom/umd/react-router-dom.js"></script>
+<script src="resource/node_modules/react-bootstrap/dist/react-bootstrap.js"></script>
+<script src="resource/node_modules/whatwg-fetch/fetch.js"></script>
 <script type="text/javascript">
   Object.keys(ReactBootstrap).forEach(function (name) { window[name] = ReactBootstrap[name]; });
 </script>
  
-<script src="react_module/navbar.js"></script>
-<script src="react_module/content.js"></script>
-<script src="react_module/single-col-body.js"></script>
-<script src="react_module/app.js"></script>
+<script src="resource/react_module/forms.js"></script>
+<script src="resource/react_module/navbar.js"></script>
+<script src="resource/react_module/content.js"></script>
+<script src="resource/react_module/single-col-body.js"></script>
+<script src="resource/react_module/app.js"></script>
+<script src="resource/react_module/route.js"></script>
 </head>
 <body id="react_root">
+  <div id="react_header"></div>
+  <div id="react_body"></div> 
+  <div id="react_footer" ><h3 text-align="center">foot</h3></div>
 </body>
   <script type="text/javascript">
-    ReactDOM.render(React.createElement(AppV), document.getElementById("react_root"));
+    ReactDOM.render(React.createElement(NavbarV), document.getElementById("react_header"));
+    var react_body_element =document.getElementById("react_body");
+    if (react_body_element) {
+      ReactDOM.render(React.createElement(RouterV), react_body_element);
+    }     
+    ReactDOM.render(React.createElement(FooterV), document.getElementById("react_footer"));
   </script>
 </html>
