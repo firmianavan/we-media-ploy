@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"github.com/firmianavan/we-media-ploy/entity"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -12,6 +13,7 @@ func init() {
 	//Register("/article/{id}/edit", EditArticle)
 	//Register("/article/{id}/comment", ShowArticle)
 	Register("/u/regist", Regist)
+	Register("/u/login", Login)
 	Register("/u/{user_id}", GetUserInfo)
 	Register("/u/update", GetUserInfo)
 }
@@ -63,5 +65,25 @@ func Regist(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err)
 	} else {
 		json.NewEncoder(w).Encode(user)
+	}
+}
+
+func Login(w http.ResponseWriter, r *http.Request) {
+	user := entity.User{}
+	json.NewDecoder(r.Body).Decode(&user)
+	ret := entity.User{}
+	err := entity.QueryUnique(&ret, "email", user.Email)
+	if err != nil && err != entity.EmptyResultError {
+		w.WriteHeader(http.StatusServiceUnavailable)
+		log.Println(err)
+		json.NewEncoder(w).Encode(err)
+	} else if err == nil && user.Passwd == ret.Passwd {
+		//登录成功
+		w.WriteHeader(http.StatusOK)
+		ret.Passwd = ""
+		json.NewEncoder(w).Encode(Resp{Status: "success", Msg: "ok", Data: ret})
+	} else {
+		w.WriteHeader(http.StatusForbidden)
+		json.NewEncoder(w).Encode(Resp{Status: "fail", Msg: "not matched"})
 	}
 }

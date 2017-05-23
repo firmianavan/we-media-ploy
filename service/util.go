@@ -6,6 +6,12 @@ import (
 	"strconv"
 )
 
+type Resp struct {
+	Status string      `json:"status"`
+	Msg    string      `json:"msg"`
+	Data   interface{} `json:"data"`
+}
+
 //对简单无嵌套结构的填充
 func Fullfil(r *http.Request, mapper entity.RowMaper) {
 	_, cols := mapper.RowMap()

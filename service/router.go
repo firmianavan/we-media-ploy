@@ -66,7 +66,7 @@ func (m Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			name, val = Match(r.URL.Path, k)
 			if name != "" {
 				mapper = f
-				break
+				//break  /u/login 同时匹配/u/{user_id}和/u/login, 正常逻辑是精确匹配(/u/login)优先. 此处若中止循环, 有可能会导致/u/login 匹配前者
 			}
 		}
 	}
