@@ -8,15 +8,13 @@ var rootPath = path.resolve(__dirname, '..'), // 项目根目录
 var commonPath = {
   rootPath: rootPath,
   dist: path.join(rootPath, 'dist'), // build 后输出目录
-  indexHTML: path.join(src, 'index.html'), // 入口基页
   staticDir: path.join(rootPath, 'static') // 无需处理的静态资源目录
 };
 
 module.exports = {
   entry: {
     'vendor': ["whatwg-fetch","react-dom","react"],
-    'app': './index.js',
-    'sign': './sign.js'
+    'app': './index.js'
   },
 
   output: {

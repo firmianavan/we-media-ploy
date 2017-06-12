@@ -7,7 +7,7 @@ import {
   LogInFormV
 } from './forms.jsx'
 
-
+ 
 import {
   BrowserRouter as Router,
   Route,
@@ -54,11 +54,25 @@ export const  RootRouterV =()=> {
 export class AppV extends React.Component{
   constructor(props) {
     super(props);
+    this.state={
+      login:{}
+    }
+  }
+  componentDidMount(){
+    LogInFormV.AskForLogin(null,null,
+      (json) =>{
+      if(json.status=="success"){
+        json.loginStatus=true
+        this.setState({
+          login:json
+        })
+      }
+    })
   }
   render(){
     return(
         <div>
-        <NavbarV />
+        <NavbarV status={this.state.login.status} data={this.state.login.data}/>
         <FooterV/>
         </div>
     )

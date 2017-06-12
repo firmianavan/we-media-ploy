@@ -28,44 +28,25 @@ function linkto(link){
 }
 
 //登录modal
-export class LogInModal extends React.Component {  
+export class UserItem extends React.Component {  
   constructor(props) {
     super(props);
-    this.state = { showModal: false };
-    this.close=this.close.bind(this)
-    this.doLogin=this.doLogin.bind(this)
-    this.doRegister=this.doRegister.bind(this)
-  }
-  close() {
-    this.setState({ showModal: false });
-  }
-  doLogin() {
-    this.setState({ 
-      showModal: true ,
-      type: 'l'
-    });
-  }
-  doRegister() {
-    this.setState({ 
-      showModal: true ,
-      type: 'r'
-    });
   }
   render() {
 
     return (
       <Nav pullRight>
       {
-        !this.state.loginStatus ?
+        !this.props.status ?
         <NavItem eventKey={1.1} href="#" onClick={linkto("/sign/in")} >登录</NavItem>
         :
         <NavItem eventKey={1.2} href="#">新文章</NavItem>
       }
       {
-        !this.state.loginStatus ?
+        !this.props.status ?
         <NavItem eventKey={2} href="#" onClick={linkto("/sign/up")} >注册</NavItem>
         :
-        <NavDropdown eventKey={3} title={this.state.user.email} id="basic-nav-dropdown">
+        <NavDropdown eventKey={3} title={this.props.data.email} id="basic-nav-dropdown">
             <MenuItem eventKey={3.1}>Action</MenuItem>
             <MenuItem eventKey={3.2}>Another action</MenuItem>
             <MenuItem eventKey={3.3}>设置</MenuItem>
@@ -73,21 +54,6 @@ export class LogInModal extends React.Component {
             <MenuItem eventKey={3.3}>登出</MenuItem>
           </NavDropdown>
       }
-        <Modal show={this.state.showModal} onHide={this.close}>
-          <Modal.Header closeButton>
-            <Modal.Title>{this.state.type=='l'?'Log In':'Register'}</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            {this.state.type=='l'?
-              //通过onSuccess获取登录成功返回的用户信息
-              <LogInFormV onSuccess={(user)=>{this.state.loginStatus=true;this.state.user=user;this.close()}}/>:
-              <RegistFormV />
-            }  
-          </Modal.Body>
-          <Modal.Footer>
-            <Button onClick={this.close}>Close</Button>
-          </Modal.Footer>
-        </Modal>
       </Nav>
     );
   }
@@ -109,7 +75,7 @@ export class NavbarV extends React.Component {
         <Navbar.Toggle />
       </Navbar.Header>
       <Navbar.Collapse>
-        <LogInModal />
+        <UserItem status={this.props.status} data={this.props.data}/>
       </Navbar.Collapse>
     </Navbar>
     )

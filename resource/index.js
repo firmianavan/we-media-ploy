@@ -6,7 +6,7 @@ var __fetch =fetch;
 fetch = function(url,option,on_json,on_error){
     __fetch(url,option)
         .then(function(response){
-            if(response.status>=200 && response<300){
+            if(response.status>=200 && response.status<300){
                 return response.json()
             }else{
                 if(on_error){
