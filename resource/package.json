@@ -5,7 +5,9 @@
     "url": "https://github.com/firmianavan"
   },
   "devDependencies": {
-    "browserify": "^14.3.0"
+    "babel-loader": "^7.0.0",
+    "browserify": "^14.3.0",
+    "webpack": "^2.6.1"
   },
   "dependencies": {
     "babel": "^6.24.1",
@@ -18,11 +20,14 @@
     "react": "15.5.3",
     "react-bootstrap": "0.30.8",
     "react-dom": "15.5.3",
-    "react-router": "^4.1.1",
     "react-router-dom": "^4.1.1",
+    "webpack-merge": "^4.1.0",
     "whatwg-fetch": "^2.0.3"
   },
   "scripts": {
-    "build": "babel react_src -d react_module -s"
+    "build2": "webpack react_src/index.js ./bundle.js",
+    "build1": "babel react_src -d react_module -s",
+    "build:dev": "webpack --env=dev --progress --profile --colors --watch",
+    "build:dist": "webpack --env=prod --progress --profile --colors "
   }
 }

@@ -3,7 +3,7 @@ use wmp;
 
 CREATE TABLE IF NOT EXISTS user(
     user_id INT NOT NULL AUTO_INCREMENT ,
-    account VARCHAR(30) UNIQUE COMMENT '账户',
+    account VARCHAR(30) NOT NULL DEFAULT '' COMMENT '账户 暂未使用该列',
     passwd VARCHAR(60) NOT NULL COMMENT '加密后的密码',
     name VARCHAR(30) NOT NULL COMMENT '昵称',
     email VARCHAR(60) UNIQUE,

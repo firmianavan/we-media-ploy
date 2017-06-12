@@ -4,11 +4,31 @@ NavItem = ReactBootstrap.NavItem,
 DropdownButton = ReactBootstrap.DropdownButton,
 MenuItem = ReactBootstrap.MenuItem,
 NavDropdown=ReactBootstrap.NavDropdown;*/
-//import { Navbar } from 'react-bootstrap';
+import  React  from 'react'
+import { 
+  Navbar,
+  Nav,
+  NavItem,
+  DropdownButton,
+  MenuItem,
+  NavDropdown,
+  Modal,
+  Button
+  } from 'react-bootstrap';
 
+import {
+  RegistFormV,
+  LogInFormV
+} from './forms.jsx'
+
+function linkto(link){
+  return () => {
+    location.href=link
+  }
+}
 
 //登录modal
-class LogInModal extends React.Component {  
+export class LogInModal extends React.Component {  
   constructor(props) {
     super(props);
     this.state = { showModal: false };
@@ -37,13 +57,13 @@ class LogInModal extends React.Component {
       <Nav pullRight>
       {
         !this.state.loginStatus ?
-        <NavItem eventKey={1.1} href="" onClick={this.doLogin}>登录</NavItem>
+        <NavItem eventKey={1.1} href="#" onClick={linkto("/sign/in")} >登录</NavItem>
         :
         <NavItem eventKey={1.2} href="#">新文章</NavItem>
       }
       {
         !this.state.loginStatus ?
-        <NavItem eventKey={2} href="" onClick={this.doRegister}>注册</NavItem>
+        <NavItem eventKey={2} href="#" onClick={linkto("/sign/up")} >注册</NavItem>
         :
         <NavDropdown eventKey={3} title={this.state.user.email} id="basic-nav-dropdown">
             <MenuItem eventKey={3.1}>Action</MenuItem>
@@ -74,7 +94,7 @@ class LogInModal extends React.Component {
 };
 
 
-class NavbarV extends React.Component {
+export class NavbarV extends React.Component {
   constructor(props) {
     super(props);
     this.state = {value: ''};

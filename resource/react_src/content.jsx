@@ -1,6 +1,6 @@
+import React from 'react'
 
-
-class ContentV extends React.Component{
+export class ContentV extends React.Component{
   constructor(props) {
     super(props);
     this.state = {
@@ -17,7 +17,21 @@ class ContentV extends React.Component{
     )
   }
 }
-class FooterV extends React.Component{
+
+export class SingleColBodyV extends React.Component{
+  constructor(props) {
+    super(props);
+  }
+  render(){
+    return(
+        <div className="container bs-docs-single-col-container">
+           {this.props.children}
+        </div>
+    )
+  }
+}
+
+export class FooterV extends React.Component{
   constructor(props) {
     super(props);
     this.state = {

@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+var static_root string = "/home/van/archive/workspace/go/src/github.com/firmianavan/we-media-ploy/resource/"
+
 type mapFunc func(http.ResponseWriter, *http.Request)
 
 type Router struct {
@@ -15,7 +17,7 @@ type Router struct {
 
 var Mux Router = Router{
 	Mapping:       make(map[string]mapFunc),
-	StaticHandler: http.FileServer(http.Dir("/home/van/archive/workspace/go/src/github.com/firmianavan/we-media-ploy/")),
+	StaticHandler: http.StripPrefix("/resource/", http.FileServer(http.Dir(static_root))),
 }
 
 //各模块自行注册路由, 允许含有0个或1个url参数,如果如下含有url参数, 将被解析到parseForm中
@@ -39,7 +41,12 @@ func Register(url string, f mapFunc) {
 }
 
 func (m Router) statics(w http.ResponseWriter, r *http.Request) bool {
-	if strings.Index(r.URL.Path, "/resource/") == 0 {
+	if r.URL.Path == "/" || r.URL.Path == "" {
+		//Fileserver会将 "*/index.html"转发到"*/", 如使用index.html作为文件名会导致重定向循环
+		r.URL.Path = "/resource/index-to-be.html"
+		m.StaticHandler.ServeHTTP(w, r)
+		return true
+	} else if strings.Index(r.URL.Path, "/resource/") == 0 {
 		//log.Println(r.URL.Path)
 		m.StaticHandler.ServeHTTP(w, r)
 		return true
@@ -63,9 +70,11 @@ func (m Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		} else if !strings.Contains(k, "{") { //配置的不含参数, 且与url不一致, 不匹配跳过
 			continue
 		} else { //配置的路径含参数, 判断是否与url匹配
-			name, val = Match(r.URL.Path, k)
-			if name != "" {
+			tmp_name, tmp_val := Match(r.URL.Path, k)
+			if tmp_name != "" {
 				mapper = f
+				name = tmp_name
+				val = tmp_val
 				//break  /u/login 同时匹配/u/{user_id}和/u/login, 正常逻辑是精确匹配(/u/login)优先. 此处若中止循环, 有可能会导致/u/login 匹配前者
 			}
 		}
@@ -76,8 +85,9 @@ func (m Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Println(name + ":" + val)
 		mapper(w, r)
 	} else {
-		log.Println("no mapper found for request url:" + r.URL.Path)
-		http.NotFound(w, r)
+		log.Println("no mapper found for request url:[" + r.URL.Path + "]. redirect to /")
+		r.URL.Path = "/"
+		m.ServeHTTP(w, r)
 	}
 }
 

@@ -1,3 +1,14 @@
+import React from 'react'
+
+import { 
+  FormGroup,
+  Form,
+  Col,
+  Button,
+  Checkbox,
+  FormControl,
+  ControlLabel
+  } from 'react-bootstrap'
 
 function callbackOneByOne(cb,...funcs){
 
@@ -27,26 +38,19 @@ var ReactValidatorsV={
       reactComponent.setState(patch)
       var ret={status:ReactValidatorsV.success}
 
-      //考虑到ajax是异步的, 不能立刻得到结果, 用回调的方式处理验证函数的调用链, 
-      for ( var f  of funcs){
-        var tmp=f(e.target.value);
-        if(tmp.status==ReactValidatorsV.error){
-          ret=tmp
-          break
-        }else if (tmp.status==ReactValidatorsV.warning){
-          ret=tmp
-        }
+      
+      if (!callback){
+        callback=()=>{}
       }
-      if (callback){
-        callback(ret.status,ret.msg)
-      }
+      ReactValidatorsV.callNext(e.target.value,callback,0,...funcs)
+      
     }
   },
   notEmpty:function(tip){
     //value是验证对象的当前值, funcs是验证链, cb是funcs验证链结束后调用, idx用来指示...func的当前位置
     return function(value,cb,idx,...funcs){
       if(value!=""){
-        ReactValidatorsV.callNext(value,cb,idx+1,funcs)
+        ReactValidatorsV.callNext(value,cb,idx+1,...funcs)
       }else{
         cb(ReactValidatorsV.error,tip)
       }
@@ -55,7 +59,7 @@ var ReactValidatorsV={
   lenBetween:function(start,end,tip){
     return function(value,cb,idx,...funcs){
       if(value.length>=start && value.length<=end ){
-        ReactValidatorsV.callNext(value,cb,idx+1,funcs)
+        ReactValidatorsV.callNext(value,cb,idx+1,...funcs)
       }else{
         cb(ReactValidatorsV.error,tip)
       }
@@ -65,7 +69,7 @@ var ReactValidatorsV={
   isEmail:function(tip){
     return function(value,cb,idx,...funcs){
       if(ReactValidatorsV.emailReg.test(value)){
-        ReactValidatorsV.callNext(value,cb,idx+1,funcs)
+        ReactValidatorsV.callNext(value,cb,idx+1,...funcs)
       }else{
         cb(ReactValidatorsV.error,tip)
       }
@@ -74,15 +78,34 @@ var ReactValidatorsV={
   equal:function(getTarget,tip){
     return function(value,cb,idx,...funcs){
       if(getTarget()==value){
-        ReactValidatorsV.callNext(value,cb,idx+1,funcs)
+        ReactValidatorsV.callNext(value,cb,idx+1,...funcs)
       }else{
         cb(ReactValidatorsV.error,tip)
       }
     }
   },
+  //访问{url}/{value}, 期待返回json对象{status,msg}, 如status=excpect则验证成功,否则验证失败, 调用cb(error,msg)
+  //该方法需放在验证链的最后的位置
   ajax:function(url,expect){
     return function(value,cb,idx,...funcs){
-      //fetch(url)
+      fetch(url+"/"+value)
+      .then(function(response) {
+        if(response.status>=200&&response.status<300)
+          return response.json()
+        else{
+          var error = new Error(response.statusText)
+          error.response = response
+          throw error
+        }
+      }).then(function(json) {
+        if(json.status=expect){
+          cb(ReactValidatorsV.success)
+        }else{
+          cb(ReactValidatorsV.success,json.msg)
+        }
+      }).catch(function(error) {
+          console.log('request failed', error)
+        })
     }
   },
   password:function(warn,error){//验证密码强弱
@@ -98,7 +121,8 @@ var ReactValidatorsV={
     if(idx==funcs.length){
       cb(ReactValidatorsV.success)
     }else{
-      funcs[idx](value,cb,idx,funcs)
+      //可变参数是一个二维数组, 
+      funcs[idx](value,cb,idx,...funcs)
     }
   }
 }
@@ -154,41 +178,34 @@ class TextareaV extends React.Component{
   }
 }
 
-//接受onSuccess作为登录成功后的回调, 用于关闭modal/显示用户菜单等
-class LogInFormV extends React.Component{
+//接受onSuccess作为登录成功后的回调(onSuccess接受服务器返回的json对象作为参数), 用于关闭modal/显示用户菜单等
+export class LogInFormV extends React.Component{
   constructor(props) {
     super(props);
     this.state = {
     };
     this.sub=this.sub.bind(this);
+  }  
+  componentDidMount(){//渲染时即判断是否有未过期的session, 有则直接登录
+    LogInFormV.AskForLogin(null,null,this.props.onSuccess)
   }
   sub(){
     if(this.state.account_validate==ReactValidatorsV.error){
       return
     }
-    fetch('/u/login',{
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json' 
-      },
-      body:JSON.stringify({
-        email:this.state.account_value,
-        passwd:this.state.passwd_value,
-      })
-    }).then(function(response) {
-      return response.json()
-    }).then((json)=>{
-      if (json.status=="success" && this.props.onSuccess){
-        this.props.onSuccess(json.data)
-      }
+    LogInFormV.AskForLogin(this.state.account_value,this.state.passwd_value,this.props.onSuccess,function(resp,ex){
+      console.log("login failed, response:")
+      console.log(resp)
+      console.log("exception:")
+      console.log(ex)
     })
-  }
+  } 
 
   render(){
     return(
         <Form horizontal>
           <ValidatableInputV label="帐号" controlId="loginAccount" type="email" placeholder="Email" validationState={this.state.account_validate} onBlur={
-            ReactValidatorsV.build(this,"account_value",(status,msg)=>{this.setState({account_validate:status})},ReactValidatorsV.lenBetween(4,5,"len error"),ReactValidatorsV.isEmail("not email"))} /> 
+            ReactValidatorsV.build(this,"account_value",(status,msg)=>{this.setState({account_validate:status})},ReactValidatorsV.lenBetween(4,60,"len error"),ReactValidatorsV.isEmail("not email"))} /> 
 
           <ValidatableInputV label="密码" controlId="loginPassword" type="password" placeholder="password" validationState={this.state.passwd_validate} onChange={
             ReactValidatorsV.build(this,"passwd_value")} /> 
@@ -210,9 +227,21 @@ class LogInFormV extends React.Component{
     )
   }
 }
+LogInFormV.AskForLogin=function(account,passwd,onJson,onError){
+    fetch('/u/login',{
+      credentials: 'same-origin',//根据fetch文档, 需要设置此项才能发送/接受cookie
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json' 
+      },
+      body:JSON.stringify({
+        email:account,
+        passwd:passwd,
+      })
+    },onJson,onError);  }
 
 //新用户注册
-class RegistFormV extends React.Component{
+export class RegistFormV extends React.Component{
   constructor(props) {
     super(props);
     this.state = {
@@ -248,7 +277,10 @@ class RegistFormV extends React.Component{
     return(
         <Form horizontal>
           <ValidatableInputV label="帐号" controlId="loginAccount" type="email" placeholder="Email" validationState={this.state.account_validate} onBlur={
-            ReactValidatorsV.build(this,"account_value",(status,msg)=>{this.setState({account_validate:status})},ReactValidatorsV.lenBetween(4,60,"长度在4-60之间"),ReactValidatorsV.isEmail("not email"))} /> 
+            ReactValidatorsV.build(this,"account_value",(status,msg)=>{console.log(msg);this.setState({account_validate:status})},
+              ReactValidatorsV.lenBetween(4,60,"长度在4-60之间"),
+              ReactValidatorsV.isEmail("not email"),
+              ReactValidatorsV.ajax("/uexist","success"))} /> 
 
           <hr className="transparent"/>
 
@@ -269,7 +301,7 @@ class RegistFormV extends React.Component{
   }
 }
 
-class AddArticleFormV extends React.Component{
+export class AddArticleFormV extends React.Component{
   constructor(props) {
     super(props);
     this.state = {

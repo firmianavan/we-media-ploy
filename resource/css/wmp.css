@@ -14,9 +14,48 @@ body {
     margin: 0;
 }
 
+/*----------------------------------------------------------------------------------------------------*/
+
 hr.transparent {
     border-color: transparent
 }
+
+
+@media (min-width: 768px) {
+    .sign:before {
+    margin-top: 80px
+    }
+}
+
+@media (min-width: 992px) {
+    .sign:before {
+    margin-top: 120px
+    }
+}
+
+@media (min-width: 1200px) {
+    .sign:before {
+    margin-top: 200px
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*------------------------------------------------------------------------------*/
+
 article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary {
     display: block
 }

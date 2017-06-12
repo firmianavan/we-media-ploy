@@ -26,4 +26,5 @@ _testmain.go
 #javascript
 resource/node_modules/*
 resource/react_module/*
+resource/dist/*
 dev.log

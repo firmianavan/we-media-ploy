@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/firmianavan/we-media-ploy/entity"
+	"github.com/gorilla/sessions"
 	"net/http"
 	"strconv"
 )
@@ -11,6 +12,8 @@ type Resp struct {
 	Msg    string      `json:"msg"`
 	Data   interface{} `json:"data"`
 }
+
+var store = sessions.NewCookieStore([]byte("djhdo8er-dsakdf-ieoqmxdbnurt"))
 
 //对简单无嵌套结构的填充
 func Fullfil(r *http.Request, mapper entity.RowMaper) {

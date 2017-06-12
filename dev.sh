@@ -22,12 +22,7 @@ if [ "$1" == "gobuild" ];then
     sleep 2
     go run $APP_HOME/server.go
 else
-    nohup watcher -cmd "babel watch_file -s -o watch_parent/../react_module/watch_name " $APP_HOME/resource/react_src  >$APP_HOME/dev.log 2>&1 &
-    sleep 1
-    nohup watcher -cmd "bash "$APP_HOME"/dev.sh gobuild" -ext go $APP_HOME  >$APP_HOME/dev.log 2>&1 &    
-    sleep 1
-    tail -100f $APP_HOME/dev.log
-    exit
+    watcher -cmd "bash "$APP_HOME"/dev.sh gobuild" -ext go $APP_HOME     
 fi
 
 

@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"github.com/firmianavan/blackfriday"
 	"github.com/firmianavan/we-media-ploy/entity"
 	"io/ioutil"
 	"log"
@@ -19,6 +20,8 @@ func init() {
 	//Register("/article/{id}/comment", ShowArticle)
 	Register("/a/new", NewArticle)
 	Register("/a/{article_id}", ShowArticle)
+
+	//从主页稍作修改获取一个模板
 	ori, _ := ioutil.ReadFile("resource/article.html")
 	t := strings.Replace(string(ori), `<div id="react_body"></div>`,
 		`<div  class="container bs-docs-single-col-container">
@@ -64,6 +67,15 @@ func ShowArticle(w http.ResponseWriter, r *http.Request) {
 func NewArticle(w http.ResponseWriter, r *http.Request) {
 	article := entity.Article{}
 	json.NewDecoder(r.Body).Decode(&article)
+
+	//解析markdown
+	unsafe := blackfriday.MarkdownCommon([]byte(article.Body))
+
+	//todo 防注入: https://github.com/microcosm-cc/bluemonday
+	//html := bluemonday.UGCPolicy().SanitizeBytes(unsafe)
+
+	article.Body = string(unsafe)
+
 	//外键约束 TODO
 	article.UserId = 1
 	article.CategoryId = 1
